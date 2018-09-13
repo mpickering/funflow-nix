@@ -1,0 +1,2 @@
+packages: ../funflow/funflow/funflow.cabal
+          *.cabal
