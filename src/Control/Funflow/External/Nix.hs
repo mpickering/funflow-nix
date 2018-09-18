@@ -12,6 +12,7 @@ import           Control.Funflow.External
 import           Data.Semigroup                   (Semigroup, (<>))
 import qualified Data.Text                        as T
 import           GHC.Generics                     (Generic)
+import           Data.List
 
 data NixpkgsSource = NIX_PATH
 
@@ -32,7 +33,7 @@ toExternal NixConfig{..} = ExternalTask
   { _etCommand = "nix-shell"
   , _etParams =
       [ "--run"
-      , Param [ParamCmd (Param (ParamText command : args))]
+      , Param [ParamCmd (Param (intersperse (ParamText " ") (ParamText command : args)))]
       ] ++ packageSpec environment
   , _etEnv = ("NIX_PATH", envParam "NIX_PATH") : env
   , _etWriteToStdOut = stdout

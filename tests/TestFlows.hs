@@ -37,8 +37,8 @@ nixConfig :: CS.Content File -> NixConfig
 nixConfig ss =
   NixConfig {
     environment = (ShellFile ss)
-    , command = "echo"
-    , args = [ParamText " ", ParamText "version"]
+    , command = "jq"
+    , args = [ParamText "--version"]
     , env = []
     , stdout = StdOutCapture
   }
@@ -53,7 +53,7 @@ jqVersion = proc () -> do
 
 flowAssertions :: [FlowAssertion]
 flowAssertions =
-  [ FlowAssertion "shell 1" () jqVersion (Just "jq-1.5") (return ()) ]
+  [ FlowAssertion "shell 1" () jqVersion (Just "jq-1.5\n") (return ()) ]
 
 testFlowAssertion :: FlowAssertion -> TestTree
 testFlowAssertion (FlowAssertion nm x flw expect before) =
