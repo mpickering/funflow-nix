@@ -1,6 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Control.Funflow.External.Nix where
 
 import           Control.Arrow                    (Kleisli (..), second)
@@ -25,8 +27,11 @@ data NixConfig =
     stdout :: OutputCapture }
 
 data Environment = ShellFile (Content File) -- ^ Path to a shell.nix file
-                 | PackageList [String] -- ^ Path to a list of packages that
+                 | PackageList [T.Text] -- ^ Path to a list of packages that
                                         -- will be passed by `-p`.
+                 deriving Generic
+
+instance ContentHashable IO Environment where
 
 toExternal :: NixConfig -> ExternalTask
 toExternal NixConfig{..} = ExternalTask
@@ -41,6 +46,8 @@ toExternal NixConfig{..} = ExternalTask
   where
     packageSpec :: Environment -> [Param]
     packageSpec (ShellFile ip) = [contentParam ip]
+    packageSpec (PackageList ps) = [textParam ("-p " <> p) | p <- ps]
+
 
 nix :: (ContentHashable IO a, ArrowFlow eff ex arr) => (a -> NixConfig)
                                                     -> arr a CS.Item

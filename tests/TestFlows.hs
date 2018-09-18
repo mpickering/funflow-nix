@@ -33,10 +33,10 @@ data FlowAssertion where
 mkError :: String -> SomeException
 mkError = toException . userError
 
-nixConfig :: CS.Content File -> NixConfig
-nixConfig ss =
+nixConfig :: Environment -> NixConfig
+nixConfig senv =
   NixConfig {
-    environment = (ShellFile ss)
+    environment = senv
     , command = "jq"
     , args = [ParamText "--version"]
     , env = []
@@ -49,11 +49,17 @@ jqVersion = proc () -> do
   cwd <- stepIO (const getCurrentDir) -< ()
   shellScript <- copyFileToStore
                     -< (FileContent (cwd </> [relfile|data/shell.nix|]),[relfile|data/shell.nix|])
-  readString_ <<< nix nixConfig -< shellScript
+  readString_ <<< nix nixConfig -< ShellFile shellScript
+
+jqVersionPkg :: SimpleFlow () String
+jqVersionPkg = readString_ <<< nix (\() -> nixConfig (PackageList ["jq"]))
+
 
 flowAssertions :: [FlowAssertion]
 flowAssertions =
-  [ FlowAssertion "shell 1" () jqVersion (Just "jq-1.5\n") (return ()) ]
+  [ FlowAssertion "shell 1" () jqVersion (Just "jq-1.5\n") (return ())
+  , FlowAssertion "shell 2" () jqVersionPkg (Just "jq-1.5\n") (return ())
+  ]
 
 testFlowAssertion :: FlowAssertion -> TestTree
 testFlowAssertion (FlowAssertion nm x flw expect before) =
