@@ -22,10 +22,16 @@ library
   exposed-modules: Control.Funflow.External.Nix
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.10, funflow, text, path
+  build-depends:       base >=4.10, funflow, text, path, modern-uri
   hs-source-dirs:      src
   ghc-options:         -Wall
   default-language:    Haskell2010
+
+executable example
+  main-is:           examples/Simple.hs
+  build-depends:     funflow, funflow-nix, path, path-io, modern-uri, base
+  ghc-options:       -Wall
+  default-language:  Haskell2010
 
 Test-suite unit-tests
   type:               exitcode-stdio-1.0
@@ -51,3 +57,4 @@ Test-suite unit-tests
                     , tasty-hunit
                     , temporary
                     , unix
+                    , modern-uri

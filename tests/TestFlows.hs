@@ -20,6 +20,7 @@ import           Path.IO
 import           Test.Tasty
 import           Test.Tasty.HUnit
 import           Control.Funflow.External.Nix
+import           Text.URI.QQ
 
 data FlowAssertion where
   FlowAssertion :: (Eq b, Show b)
@@ -33,32 +34,40 @@ data FlowAssertion where
 mkError :: String -> SomeException
 mkError = toException . userError
 
-nixConfig :: Environment -> NixConfig
-nixConfig senv =
-  NixConfig {
+nixConfig :: (NixpkgsSource, Environment) -> NixConfig
+nixConfig (nps, senv) =
+  NixShellConfig {
     environment = senv
     , command = "jq"
     , args = [ParamText "--version"]
     , env = []
     , stdout = StdOutCapture
+    , nixpkgsSource = nps
   }
 
 -- | Test that we can merge directories within the content store.
-jqVersion :: SimpleFlow () String
-jqVersion = proc () -> do
+jqVersion :: SimpleFlow NixpkgsSource String
+jqVersion = proc np -> do
   cwd <- stepIO (const getCurrentDir) -< ()
   shellScript <- copyFileToStore
                     -< (FileContent (cwd </> [relfile|data/shell.nix|]),[relfile|data/shell.nix|])
-  readString_ <<< nix nixConfig -< ShellFile shellScript
+  readString_ <<< nix nixConfig -< (np, ShellFile shellScript)
 
-jqVersionPkg :: SimpleFlow () String
-jqVersionPkg = readString_ <<< nix (\() -> nixConfig (PackageList ["jq"]))
+jqVersionPkg :: SimpleFlow NixpkgsSource String
+jqVersionPkg = readString_ <<< nix (\np -> nixConfig (np, PackageList ["jq"]))
+
+tarballSource :: NixpkgsSource
+tarballSource = NixpkgsTarball [uri|https://github.com/NixOS/nixpkgs/archive/a19357241973538212b5cb435dde84ad25cbe337.tar.gz|]
 
 
 flowAssertions :: [FlowAssertion]
 flowAssertions =
-  [ FlowAssertion "shell 1" () jqVersion (Just "jq-1.5\n") (return ())
-  , FlowAssertion "shell 2" () jqVersionPkg (Just "jq-1.5\n") (return ())
+  [
+    FlowAssertion "shell 1" NIX_PATH jqVersion (Just "jq-1.5\n") (return ())
+  , FlowAssertion "shell 2" NIX_PATH jqVersionPkg (Just "jq-1.5\n") (return ())
+
+  , FlowAssertion "shell tarball 1" tarballSource jqVersion (Just "jq-1.5\n") (return ())
+  , FlowAssertion "shell tarball 2" tarballSource jqVersionPkg (Just "jq-1.5\n") (return ())
   ]
 
 testFlowAssertion :: FlowAssertion -> TestTree
