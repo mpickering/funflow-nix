@@ -26,7 +26,8 @@ jqVersion :: SimpleFlow NixpkgsSource String
 jqVersion = proc np -> do
   cwd <- stepIO (const getCurrentDir) -< ()
   shellScript <- copyFileToStore
-                    -< (FileContent (cwd </> [relfile|data/shell.nix|]),[relfile|data/shell.nix|])
+                    -< (FileContent (cwd </> [relfile|data/shell.nix|])
+                                    ,[relfile|data/shell.nix|])
   readString_ <<< nix nixConfig -< (np, ShellFile shellScript)
 
 jqVersionPkg :: SimpleFlow NixpkgsSource String
