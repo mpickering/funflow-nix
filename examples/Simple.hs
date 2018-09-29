@@ -1,15 +1,11 @@
 {-# LANGUAGE Arrows            #-}
-{-# LANGUAGE GADTs             #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeApplications  #-}
-module Main where
+module Main(main) where
 
 import           Control.Arrow
 import           Control.Funflow
 import           Control.Funflow.ContentHashable
-import qualified Control.Funflow.ContentStore                as CS
 import           Path
 import           Path.IO
 import           Control.Funflow.External.Nix
@@ -56,7 +52,4 @@ main = do
       Right out -> do
         putStrLn $ "SUCCESS"
         print out
-
-storePath :: ArrowFlow eff ex arr => arr (CS.Content Dir) (Path Abs Dir)
-storePath = getFromStore return
 
