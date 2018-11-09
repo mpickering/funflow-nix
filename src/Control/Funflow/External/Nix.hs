@@ -3,8 +3,11 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE DeriveGeneric #-}
-module Control.Funflow.External.Nix(NixConfig(..), NixpkgsSource(..)
-                                   , Environment(..), nix )where
+module Control.Funflow.External.Nix
+  ( NixConfig(..)
+  , NixpkgsSource(..)
+  , Environment(..)
+  , nix )where
 
 import           Control.Funflow
 import           Path
@@ -42,7 +45,6 @@ instance ContentHashable IO Environment where
 instance ContentHashable IO NixpkgsSource where
   contentHashUpdate ctx NIX_PATH           = contentHashUpdate_fingerprint ctx NIX_PATH
   contentHashUpdate ctx (NixpkgsTarball s) = contentHashUpdate ctx (URI.render s)
-
 
 nixpkgsSourceToParam :: NixpkgsSource -> Param
 nixpkgsSourceToParam NIX_PATH = envParam "NIX_PATH"
