@@ -13,6 +13,7 @@ import           Control.Funflow
 import           Path
 import           Control.Funflow.ContentHashable
 import           Control.Funflow.ContentStore as CS
+import           Control.Funflow.External     as E
 import           Data.Semigroup                   ((<>))
 import qualified Data.Text                        as T
 import           GHC.Generics                     (Generic)
@@ -57,7 +58,7 @@ toExternal NixShellConfig{..} = ExternalTask
       [ "--run"
       , Param [ParamCmd (Param (intersperse (ParamText " ") (ParamText command : args)))]
       ] ++ packageSpec environment
-  , _etEnv = ("NIX_PATH", nixpkgsSourceToParam nixpkgsSource ) : env
+  , _etEnv = E.EnvExplicit $ ("NIX_PATH", nixpkgsSourceToParam nixpkgsSource ) : env
   , _etWriteToStdOut = stdout
   }
   where
