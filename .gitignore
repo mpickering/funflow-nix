@@ -2,3 +2,4 @@ dist/
 dist-newstyle/
 .ghc.environment*
 funflow-example/
+cabal.project.local
