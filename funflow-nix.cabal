@@ -17,6 +17,7 @@ maintainer:          matthewtpickering@gmail.com
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
+tested-with:         GHC==8.2.2
 
 flag example
   Description: Build the example executable
