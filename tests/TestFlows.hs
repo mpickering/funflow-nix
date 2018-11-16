@@ -63,8 +63,8 @@ tarballSource = NixpkgsTarball [uri|https://github.com/NixOS/nixpkgs/archive/a19
 flowAssertions :: [FlowAssertion]
 flowAssertions =
   [
-    FlowAssertion "shell 1" NIX_PATH jqVersion (Just "jq-1.5\n") (return ())
-  , FlowAssertion "shell 2" NIX_PATH jqVersionPkg (Just "jq-1.5\n") (return ())
+    FlowAssertion "shell 1" NIX_PATH jqVersion (Just "jq-1.6\n") (return ())
+  , FlowAssertion "shell 2" NIX_PATH jqVersionPkg (Just "jq-1.6\n") (return ())
 
   , FlowAssertion "shell tarball 1" tarballSource jqVersion (Just "jq-1.5\n") (return ())
   , FlowAssertion "shell tarball 2" tarballSource jqVersionPkg (Just "jq-1.5\n") (return ())
